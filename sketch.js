@@ -28,8 +28,22 @@ function draw()
     
     background(0)
     
-    var p = new Particle()
-    particles.push(p)
+    
+    //Variable Tieing
+    bassMapped = map(bass,0,255,0,1)
+    midMapped = map(mid,0,255,0,1)
+    trebleMapped = map(treble,0,255,0,1)
+    
+    
+    
+    
+    if(isPlaying) //This is a boolean to check if the song is playing
+        {
+                var p = new Particle()
+                particles.push(p)
+        }
+    
+
     
     for(var i = 0; i < particles.length; i++)
         {
@@ -41,6 +55,14 @@ function draw()
                     particles.splice(i,1)
                 }
         }
+    
+    
+    
+    //HUD Related function
+    fill(255)
+    text("Please use a MP3 File to start playing",290,30)
+    
+//    console.log(amplitude.volume)
 }
 
 class Particle {
@@ -62,8 +84,6 @@ class Particle {
     
     update()
     {
-        this.x += this.vx 
-        this.y += this.vy
         this.trans --
         
         this.velocity.add(this.gravity);
