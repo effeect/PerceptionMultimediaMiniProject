@@ -14,49 +14,58 @@ var bassMapped;
 var midMapped;
 var trebleMapped; 
 
-var max = 0;
+var bassSlider;
+var midSlider;
+var trebleSlider;
+
+var levelMapped;
 
 
 function setup()
 {
     setupSound()
     createCanvas(800,500)
+    
+    //HUD RELATED FUNCTIONS
+    //Bass Values
+    bassSlider = createSlider(0,255,100)
+    bassSlider.position(20,430)
+    //Mid Values
+    midSlider = createSlider(0,255,100)
+    midSlider.position(20,460)
+    //Treble Values
+    trebleSlider = createSlider(0,255,100)
+    trebleSlider.position(20,490)
 }
 
 function draw()
 {
     drawSound()
-    colorMode(HSB)
-    background(bass,50,50)
     
-    colorMode(RGB)
+    levelMapped = map(level,0,1,0,255)
+    background(levelMapped)
     
     //Variable Tieing
     //All of these variables are being tied to vectors
-    bassMapped = map(bass,0,255,-5,0)
-    midMapped = map(mid,0,255,-1,1)
-    trebleMapped = map(treble,0,255,-1,1)
-    
-    //Misc
-    
-    
-    
+    bassMapped = map(bass,0,255,0,-0.03)
+    midMapped = map(mid,0,255,0,-0.03)
+    trebleMapped = map(treble,0,255,0,-0.03)
     
     if(isPlaying) //This is a boolean to check if the song is playing
         {
                 var p = new bassParticle()
                 var b = new midParticle()
                 var t = new trebleParticle()
-                if(bass > 150)
+                if(bass > bassSlider.value())
                     {
                         particles.push(p)
                     }
-                if(mid > 150)
+                if(mid > midSlider.value())
                     {
                         particles.push(b)
 
                     }
-                if(treble > 100)
+                if(treble > trebleSlider.value())
                     {
                         particles.push(t)
 
@@ -76,21 +85,30 @@ function draw()
         }
     
     
+// Visual representation
+//    fill(255)
+//    rect(0,300,bass,20)
+//    fill(0,255,0)
+//    rect(0,320,mid,20)
+//    fill(0,0,255)
+//    rect(0,340,treble,20)
+//    fill(0)
+//    rect(0,400,300,100)
+    
     fill(255)
-    rect(0,300,bass,20)
-    fill(0,255,0)
-    rect(0,320,mid,20)
-    fill(0,0,255)
-    rect(0,340,treble,20)
+    text("Bass Threshold : " + bassSlider.value(), 170,423)
+    text("Mid Threshold : " + midSlider.value(), 170,453)
+    text("Treble Threshold : " + trebleSlider.value(), 170,483)
+    
     //HUD Related function
     fill(255)
     text("Please use a MP3 File to start playing",290,30)
     
-    if(amplitude.volume > max)
-        {
-            max = amplitude.volume
-            console.log(amplitude.volume)
-        }
+    //Note, using Math.trunc is not currently supported by IE. It supports all other major browsers according to this article https://pawelgrzybek.com/rounding-and-truncating-numbers-in-javascript/
+    text("Bass = " + Math.trunc(bass), 25,350)
+    text("Mid = " + Math.trunc(mid), 25,370)
+    text("Treble = " + Math.trunc(treble), 25,390)
+
 }
 
 //List of particles
@@ -98,29 +116,23 @@ function draw()
 class bassParticle {
     
     constructor() { //This is where all of the variables are intially intialised
-        
         this.location = createVector(width/2,height/2)
         this.velocity = createVector(random(-1,1),random(-4,-1))
-        
-        
-        this.bassVector = createVector(0,bassMapped)
-        
-        this.gravity = createVector(0,0.05)
-        
+        this.gravity = createVector(random(-0.04,0.04),0.05)
         this.trans = 255;
-        
         this.size = bass * 0.03 + 10
     }
     
     update()
     {
-        if(this.location.y > 500 || this.location.y < 0)
-            {
-                this.velocity.mult(-1)
-            }
+//        if(this.location.y > 500 || this.location.y < 0)
+//            {
+//                this.velocity.mult(-1)
+//            }
+        this.bassVector = createVector(0,bassMapped)
         
         this.trans --
-        
+        this.velocity.add(this.bassVector)
         this.velocity.add(this.gravity);
         this.location.add(this.velocity);
 
@@ -151,7 +163,7 @@ class midParticle {
         
         this.midVector = createVector(0,midMapped)
         
-        this.gravity = createVector(0,0.05)
+        this.gravity = createVector(random(-0.04,0.04),0.05)
         
         this.trans = 255;
         
@@ -160,10 +172,10 @@ class midParticle {
     
     update()
     {
-        if(this.location.y > 500 || this.location.y < 0)
-            {
-                this.velocity.mult(-1)
-            }
+//        if(this.location.y > 500 || this.location.y < 0)
+//            {
+//                this.velocity.mult(-1)
+//            }
         
         this.trans --
         
@@ -209,10 +221,10 @@ class trebleParticle {
     
     update()
     {
-        if(this.location.y > 500 || this.location.y < 0)
-            {
-                this.velocity.mult(-1)
-            }
+//        if(this.location.y > 500 || this.location.y < 0)
+//            {
+//                this.velocity.mult(-1)
+//            }
         
         this.trans --
         
@@ -233,7 +245,8 @@ class trebleParticle {
         
         noStroke()
         fill(0,0,255,this.trans)
-        ellipse(this.location.x,this.location.y,this.size,this.size)
+//        ellipse(this.location.x,this.location.y,this.size,this.size)
+        triangle(this.location.x,this.location.y,this.location.x + this.size, this.location.y, this.location.x + (this.size/2),this.location.y - this.size)
     }
     
 }
