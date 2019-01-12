@@ -14,6 +14,9 @@ var bassMapped;
 var midMapped;
 var trebleMapped; 
 
+var max = 0;
+
+
 function setup()
 {
     setupSound()
@@ -25,14 +28,18 @@ function setup()
 function draw()
 {
     drawSound()
+    colorMode(HSB)
+    background(bass,50,50)
     
-    background(0)
-    
+    colorMode(RGB)
     
     //Variable Tieing
-    bassMapped = map(bass,0,255,0,1)
-    midMapped = map(mid,0,255,0,1)
-    trebleMapped = map(treble,0,255,0,1)
+    //All of these variables are being tied to vectors
+    bassMapped = map(bass,0,255,-5,0)
+    midMapped = map(mid,0,255,-1,1)
+    trebleMapped = map(treble,0,255,-1,1)
+    
+    //Misc
     
     
     
@@ -42,8 +49,6 @@ function draw()
                 var p = new Particle()
                 particles.push(p)
         }
-    
-
     
     for(var i = 0; i < particles.length; i++)
         {
@@ -57,12 +62,17 @@ function draw()
         }
     
     
+    rect(0,300,bass,20)
     
     //HUD Related function
     fill(255)
     text("Please use a MP3 File to start playing",290,30)
     
-//    console.log(amplitude.volume)
+    if(amplitude.volume > max)
+        {
+            max = amplitude.volume
+            console.log(amplitude.volume)
+        }
 }
 
 class Particle {
@@ -72,24 +82,35 @@ class Particle {
         this.location = createVector(width/2,height/2)
         this.velocity = createVector(random(-1,1),random(-4,-1))
         
+        
+        this.bassVector = createVector(0,bassMapped)
+        
         this.gravity = createVector(0,0.05)
         
-        this.x = width/2
-        this.y = height/2
-        this.vx = random(-1,1)
-        this.vy = random(-5,-1)
-        
         this.trans = 255;
+        
+        this.size = bass * 0.03 + 10
     }
     
     update()
     {
+        
         this.trans --
         
         this.velocity.add(this.gravity);
         
-        this.location.add(this.velocity);
         
+        if(bass > 50)
+            {
+                        this.location.add(this.velocity);
+
+            }
+        
+        if(bass > 100)
+            {
+                        this.location.add(this.bassVector)
+
+            }
         
     }
     
@@ -99,9 +120,10 @@ class Particle {
     }
     
     show() {
-        stroke(255)
-        fill(255,random(0,200),0,this.trans)
-        ellipse(this.location.x,this.location.y,16)
+        
+        noStroke()
+        fill(255,0,0,this.trans)
+        ellipse(this.location.x,this.location.y,this.size,this.size)
     }
     
 }
