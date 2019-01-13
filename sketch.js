@@ -146,7 +146,7 @@ class bassParticle { //RED CIRCLE
     }
     
     show() {
-        noStroke()
+        stroke(0)
         fill(255,0,0,this.trans)
         ellipse(this.location.x,this.location.y,this.size,this.size)
     }
@@ -180,7 +180,7 @@ class midParticle { //GREEN SQUARE
     
     show() {
         
-        noStroke()
+        stroke(0)
         fill(0,255,0,this.trans)
         rect(this.location.x,this.location.y,this.size,this.size)
     }
@@ -211,7 +211,7 @@ class trebleParticle { //BLUE TRIANGLE
     }
     
     show() {
-        noStroke()
+        stroke(0)
         fill(0,0,255,this.trans)
         triangle(this.location.x,this.location.y,this.location.x + this.size, this.location.y, this.location.x + (this.size/2),this.location.y - this.size)
     }
