@@ -10,42 +10,43 @@ There are five main variables you can access that give out values, they spit out
 
 var particles = [];
 
+//Mapped Variables
 var bassMapped;
 var midMapped;
 var trebleMapped; 
 
+//Sliders (FOR GUI)
 var bassSlider;
 var midSlider;
 var trebleSlider;
 
 var levelMapped;
 
-
 function setup()
 {
     setupSound()
     createCanvas(800,500)
-    
     //HUD RELATED FUNCTIONS
     //Bass Values
-    bassSlider = createSlider(0,255,100)
+    bassSlider = createSlider(0,255,150)
     bassSlider.position(20,430)
     //Mid Values
-    midSlider = createSlider(0,255,100)
+    midSlider = createSlider(0,255,120)
     midSlider.position(20,460)
     //Treble Values
-    trebleSlider = createSlider(0,255,100)
+    trebleSlider = createSlider(0,255,40)
     trebleSlider.position(20,490)
 }
 
 function draw()
 {
     drawSound()
-    
+    background(0)
+/*  UNCOMMENT THIS TO ALLOW FOR INTERACTIVE BACKGROUND (NOT RECOMMENDED)
     levelMapped = map(level,0,1,0,255)
     background(levelMapped)
+*/  
     
-    //Variable Tieing
     //All of these variables are being tied to vectors
     bassMapped = map(bass,0,255,0,-0.03)
     midMapped = map(mid,0,255,0,-0.03)
@@ -53,16 +54,19 @@ function draw()
     
     if(isPlaying) //This is a boolean to check if the song is playing
         {
-                var p = new bassParticle()
-                var b = new midParticle()
+            //Particle generation happens here
+                var b = new bassParticle()
+                var m = new midParticle()
                 var t = new trebleParticle()
+                
+                //THIS GENERATES THE PARTICLES. The .value() function is the slider value in the GUI. Can be modified to any value between 0 and 255
                 if(bass > bassSlider.value())
                     {
-                        particles.push(p)
+                        particles.push(b)
                     }
                 if(mid > midSlider.value())
                     {
-                        particles.push(b)
+                        particles.push(m)
 
                     }
                 if(treble > trebleSlider.value())
@@ -73,28 +77,32 @@ function draw()
                 
         }
     
+    //This loop runs all of the particles at once
     for(var i = 0; i < particles.length; i++)
         {
-            particles[i].show();
-            particles[i].update();
             
+            particles[i].show(); //RENDERING
+            particles[i].update(); //DYNAMICS
+            
+            //ACTS AS DECONSTRUCTOR
             if(particles[i].gone())
                 {
-                    particles.splice(i,1)
+                    particles.splice(i,1) 
                 }
         }
     
+/* 
+    //BAR TO REPRESENT bass, mid and treble values. Used for debugging but can be enabled for normal use
     
-// Visual representation
-//    fill(255)
-//    rect(0,300,bass,20)
-//    fill(0,255,0)
-//    rect(0,320,mid,20)
-//    fill(0,0,255)
-//    rect(0,340,treble,20)
-//    fill(0)
-//    rect(0,400,300,100)
-    
+    fill(255)
+    rect(0,300,bass,20)
+    fill(0,255,0)
+    rect(0,320,mid,20)
+    fill(0,0,255)
+    rect(0,340,treble,20)
+    fill(0)
+    rect(0,400,300,100)
+*/
     fill(255)
     text("Bass Threshold : " + bassSlider.value(), 170,423)
     text("Mid Threshold : " + midSlider.value(), 170,453)
@@ -113,31 +121,23 @@ function draw()
 
 //List of particles
 
-class bassParticle {
+class bassParticle { //RED CIRCLE
     
     constructor() { //This is where all of the variables are intially intialised
         this.location = createVector(width/2,height/2)
         this.velocity = createVector(random(-1,1),random(-4,-1))
         this.gravity = createVector(random(-0.04,0.04),0.05)
-        this.trans = 255;
-        this.size = bass * 0.03 + 10
+        this.trans = 300;
+        this.size = bass * 0.08 + 10
     }
     
     update()
     {
-//        if(this.location.y > 500 || this.location.y < 0)
-//            {
-//                this.velocity.mult(-1)
-//            }
         this.bassVector = createVector(0,bassMapped)
-        
         this.trans --
         this.velocity.add(this.bassVector)
         this.velocity.add(this.gravity);
         this.location.add(this.velocity);
-
-
-        
     }
     
     gone()
@@ -146,7 +146,6 @@ class bassParticle {
     }
     
     show() {
-        
         noStroke()
         fill(255,0,0,this.trans)
         ellipse(this.location.x,this.location.y,this.size,this.size)
@@ -154,38 +153,23 @@ class bassParticle {
     
 }
 
-class midParticle {
-        constructor() { //This is where all of the variables are intially intialised
-        
-            
+class midParticle { //GREEN SQUARE
+    
+    constructor() { //This is where all of the variables are intially intialised
         this.location = createVector(width/3,height/2)
         this.velocity = createVector(random(-1,1),random(-4,-1))
-        
-        this.midVector = createVector(0,midMapped)
-        
         this.gravity = createVector(random(-0.04,0.04),0.05)
-        
-        this.trans = 255;
-        
-        this.size = mid * 0.03 + 10
+        this.trans = 300;
+        this.size = mid * 0.08 + 10
     }
     
-    update()
+    update() //Updates 60 times a second
     {
-//        if(this.location.y > 500 || this.location.y < 0)
-//            {
-//                this.velocity.mult(-1)
-//            }
-        
-        this.trans --
-        
+        this.midVector = createVector(0,midMapped)
+        this.trans -- 
+        this.velocity.add(this.midVector)
         this.velocity.add(this.gravity);
-        
-
         this.location.add(this.velocity);
-        this.location.add(this.midVector)
-
-
 
     }
     
@@ -202,38 +186,23 @@ class midParticle {
     }
 }
 
-class trebleParticle {
+class trebleParticle { //BLUE TRIANGLE
     
     constructor() { //This is where all of the variables are intially intialised
-        
         this.location = createVector(width/3 * 2,height/2)
         this.velocity = createVector(random(-1,1),random(-4,-1))
-        
-        
-        this.trebleVector = createVector(0,trebleMapped)
-        
         this.gravity = createVector(random(-0.04,0.04),0.05)
-        
-        this.trans = 255;
-        
-        this.size = treble * 0.03 + 10
+        this.trans = 300;
+        this.size = treble * 0.08 + 10
     }
     
     update()
     {
-//        if(this.location.y > 500 || this.location.y < 0)
-//            {
-//                this.velocity.mult(-1)
-//            }
-        
+        this.trebleVector = createVector(0,trebleMapped)
         this.trans --
-        
+        this.velocity.add(this.trebleVector)
         this.velocity.add(this.gravity);
-        
         this.location.add(this.velocity);
-        this.location.add(this.bassVector)
-
-        
     }
     
     gone()
@@ -242,10 +211,8 @@ class trebleParticle {
     }
     
     show() {
-        
         noStroke()
         fill(0,0,255,this.trans)
-//        ellipse(this.location.x,this.location.y,this.size,this.size)
         triangle(this.location.x,this.location.y,this.location.x + this.size, this.location.y, this.location.x + (this.size/2),this.location.y - this.size)
     }
     
